@@ -1,0 +1,25 @@
+.product-grid-container {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* 5 cột có chiều rộng bằng nhau */
+    gap: 20px; /* Khoảng cách giữa các sản phẩm */
+  }
+  
+  /* Thiết lập responsive cho grid layout */
+  @media (max-width: 1200px) {
+    .product-grid-container {
+      grid-template-columns: repeat(4, 1fr); /* 4 cột trên một hàng khi màn hình thu nhỏ */
+    }
+  }
+  
+  @media (max-width: 900px) {
+    .product-grid-container {
+      grid-template-columns: repeat(3, 1fr); /* 3 cột trên một hàng khi màn hình thu nhỏ hơn */
+    }
+  }
+  
+  @media (max-width: 600px) {
+    .product-grid-container {
+      grid-template-columns: repeat(2, 1fr); /* 2 cột trên một hàng khi màn hình rất nhỏ */
+    }
+  }
+  

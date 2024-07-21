@@ -1,0 +1,27 @@
+.formAdminProduct{
+    width:70%;
+    margin: 0 auto; 
+    padding: 30px;
+    margin-bottom: 50%;
+    border-bottom: 50px
+    
+}
+.btnAdd{
+    margin-left: 10px;
+}
+.btnAdminProduct{
+    padding-left:  5px;
+    border: 2px solid;
+    margin-bottom: 20px;
+    
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: row;
+}
+.btnProduct{
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1px;
+    flex-direction: row
+}
+    
