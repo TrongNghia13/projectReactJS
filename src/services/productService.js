@@ -2,15 +2,17 @@ import data from "../MOCK_DATA.json";
 
 const PRODUCT_LOCAL_STORAGE_KEY = "products";
 const storage = localStorage;
+
+// Helper functions
 const getStorageData = (key, defaultValue) => {
   const jsonStringData = storage.getItem(key);
-  console.log("check log getStorageData:", jsonStringData);
   const parseStringData = jsonStringData
     ? JSON.parse(jsonStringData)
     : defaultValue;
 
   return parseStringData;
 };
+
 const setStorageData = (key, value) => {
   const jsonStringValue = JSON.stringify(value);
   storage.setItem(key, jsonStringValue);
@@ -47,6 +49,14 @@ const ProductService = {
     });
   },
 
+  getProducts: async () => {
+    const products = getStorageData(PRODUCT_LOCAL_STORAGE_KEY, []);
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(products);
+      }, 500);
+    });
+  },
   getById: async (id) => {
     const products = getStorageData(PRODUCT_LOCAL_STORAGE_KEY, []);
     const product = products.find((product) => product.id === id);
@@ -78,11 +88,11 @@ const ProductService = {
   create: async (newProduct) => {
     const newProductData = {
       ...newProduct,
-      id: Date.now(),
+      id: Date.now(), // Tạo ID mới cho sản phẩm
     };
 
     const products = getStorageData(PRODUCT_LOCAL_STORAGE_KEY, []);
-    const newProducts = [newProductData].concat(...products);
+    const newProducts = [newProductData, ...products]; // Thêm sản phẩm mới vào đầu danh sách
 
     setStorageData(PRODUCT_LOCAL_STORAGE_KEY, newProducts);
 
@@ -92,6 +102,7 @@ const ProductService = {
       }, 500);
     });
   },
+
   deleteProduct: async (productId) => {
     const products = getStorageData(PRODUCT_LOCAL_STORAGE_KEY, []);
     const updatedProducts = products.filter(
@@ -107,10 +118,16 @@ const ProductService = {
 
   updateProduct: async (updatedProduct) => {
     const products = getStorageData(PRODUCT_LOCAL_STORAGE_KEY, []);
+    console.log("Before update:", products);
+
+    // Đảm bảo rằng bạn so sánh ID đúng kiểu (số hoặc chuỗi)
     const updatedProducts = products.map((product) =>
-      product.id === updatedProduct.id ? updatedProduct : product
+      product.id === parseInt(updatedProduct.id, 10) ? updatedProduct : product
     );
+
     setStorageData(PRODUCT_LOCAL_STORAGE_KEY, updatedProducts);
+    console.log("After update:", updatedProducts);
+
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve(updatedProduct);

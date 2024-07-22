@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useHistory, useParams } from "react-router-dom";
-import ProductService from "../services/productService"; // Adjust path if needed
+import { useParams, useHistory } from "react-router-dom";
+import ProductService from "../services/productService";
 import {
   Typography,
   TextField,
@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 
 const EditProduct = () => {
-  const { productId } = useParams();
+  const { productId } = useParams(); // Lấy productId từ URL
   const [title, setTitle] = useState("");
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
@@ -22,8 +22,7 @@ const EditProduct = () => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
-  const [product, setProduct] = useState(null);
-  const [isLoading, setIsLoading] = useState(true); // Added for loading state
+  const [isLoading, setIsLoading] = useState(true);
   const history = useHistory();
 
   const [errors, setErrors] = useState({
@@ -36,48 +35,49 @@ const EditProduct = () => {
   });
 
   const handleBlur = (field) => (e) => {
-    setErrors({ ...errors, [field]: true });
+    setErrors({ ...errors, [field]: e.target.value === "" });
   };
+
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
   };
 
   useEffect(() => {
+    console.log("Product ID:", productId); // Kiểm tra giá trị productId
+    if (!productId) {
+      console.error("Product ID is missing.");
+      return;
+    }
+
     const fetchProduct = async () => {
-      setIsLoading(true); // Set loading state to true
+      setIsLoading(true);
       const fetchedProduct = await ProductService.getById(productId);
-      setProduct(fetchedProduct);
-      setIsLoading(false); // Set loading state to false
+      if (fetchedProduct) {
+        setTitle(fetchedProduct.title || "");
+        setPrice(fetchedProduct.price || "");
+        setDescription(fetchedProduct.description || "");
+        setImage(fetchedProduct.image || "");
+        setRating(fetchedProduct.rating?.rate || "");
+        setCount(fetchedProduct.rating?.count || "");
+      }
+      setIsLoading(false);
     };
+
     fetchProduct();
   }, [productId]);
-
-  const handleUpdateProduct = async () => {
-    await ProductService.updateProduct(product);
-    history.push("/admin/products/list");
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const newErrors = {
-      title: title === "",
-      price: price === "",
-      description: description === "",
-      image: image === "",
-      rating: rating === "",
-      count: count === "",
-    };
-
-    if (Object.values(newErrors).some((error) => error)) {
-      setErrors(newErrors);
-      setSnackbarMessage("Please fill out all required fields.");
+    if (!productId) {
+      setSnackbarMessage("Product ID is missing.");
       setSnackbarSeverity("error");
       setOpenSnackbar(true);
       return;
     }
 
-    const newProduct = {
+    const updatedProduct = {
+      id: productId,
       title,
       price,
       description,
@@ -89,15 +89,14 @@ const EditProduct = () => {
     };
 
     try {
-      const response = await ProductService.updateProduct(newProduct);
-      console.log("check log updateProduct:", response);
-
+      const response = await ProductService.updateProduct(updatedProduct);
       if (response) {
         setSnackbarMessage("Product edited successfully!");
         setSnackbarSeverity("success");
         setOpenSnackbar(true);
-        setTitle("");
-        setPrice("");
+        setTimeout(() => {
+          history.push("/admin/product");
+        }, 1500);
       }
     } catch (error) {
       setSnackbarMessage("Failed to edit product.");
@@ -105,6 +104,7 @@ const EditProduct = () => {
       setOpenSnackbar(true);
     }
   };
+
   return (
     <Box sx={{ maxWidth: 500, mx: "auto", mt: 4 }}>
       <Typography variant="h4" gutterBottom>
@@ -117,23 +117,69 @@ const EditProduct = () => {
           <TextField
             label="Title"
             value={title}
-            // value={product?.title || ""}
-            onChange={(e) => setTitle(e.ta)}
+            onChange={(e) => setTitle(e.target.value)}
             onBlur={handleBlur("title")}
+            error={errors.title}
+            helperText={errors.title && "Title is required"}
+            fullWidth
+            margin="normal"
           />
           <TextField
-            label="price"
+            label="Price"
             value={price}
             onChange={(e) => setPrice(e.target.value)}
             onBlur={handleBlur("price")}
+            error={errors.price}
+            helperText={errors.price && "Price is required"}
+            fullWidth
+            margin="normal"
           />
-          {/* ... other fields using optional chaining ... */}
+          <TextField
+            label="Description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            onBlur={handleBlur("description")}
+            error={errors.description}
+            helperText={errors.description && "Description is required"}
+            fullWidth
+            margin="normal"
+          />
+          <TextField
+            label="Image URL"
+            value={image}
+            onChange={(e) => setImage(e.target.value)}
+            onBlur={handleBlur("image")}
+            error={errors.image}
+            helperText={errors.image && "Image URL is required"}
+            fullWidth
+            margin="normal"
+          />
+          <TextField
+            label="Rating"
+            value={rating}
+            onChange={(e) => setRating(e.target.value)}
+            onBlur={handleBlur("rating")}
+            error={errors.rating}
+            helperText={errors.rating && "Rating is required"}
+            fullWidth
+            margin="normal"
+          />
+          <TextField
+            label="Count"
+            value={count}
+            onChange={(e) => setCount(e.target.value)}
+            onBlur={handleBlur("count")}
+            error={errors.count}
+            helperText={errors.count && "Count is required"}
+            fullWidth
+            margin="normal"
+          />
           <Button
-            onClick={() => handleUpdateProduct}
             variant="contained"
             color="primary"
             type="submit"
             fullWidth
+            sx={{ mt: 2 }}
           >
             Edit Product
           </Button>

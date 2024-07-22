@@ -1,74 +1,80 @@
 import React, { useEffect, useState } from "react";
-import { Link, useHistory } from "react-router-dom";
-import ProductService from "../services/productService"; // Điều chỉnh đường dẫn nếu cần
+import { useHistory, useLocation } from "react-router-dom";
+import ProductService from "../services/productService";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditCalendarIcon from "@mui/icons-material/EditCalendar";
 import AddIcon from "@mui/icons-material/Add";
 import {
   Typography,
-  TextField,
   Button,
-  Snackbar,
-  Alert,
   Box,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from "@mui/material";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
 
 import "../styles/adminProductList.css";
 
-const AdminProductList = ({ handleSearch }) => {
+const AdminProductList = () => {
   const [products, setProducts] = useState([]);
-  const [openSnackbar, setOpenSnackbar] = useState();
   const history = useHistory();
+  const location = useLocation();
   const [selectedProductId, setSelectedProductId] = useState(undefined);
 
   const handleClickOpen = (pid) => {
     setSelectedProductId(pid);
   };
+
   const handleClose = () => {
     setSelectedProductId(undefined);
   };
 
+  const fetchProducts = async () => {
+    const fetchedProducts = await ProductService.getPaged({
+      limit: 100,
+      offset: 0,
+    });
+    setProducts(fetchedProducts);
+  };
+
   useEffect(() => {
-    const fetchProducts = async () => {
-      const fetchedProducts = await ProductService.getPaged({
-        limit: 100,
-        offset: 0,
-      }); // Điều chỉnh limit và offset nếu cần
-      setProducts(fetchedProducts);
-      console.log("check:", fetchedProducts);
-    };
     fetchProducts();
-  }, []);
+    const unlisten = history.listen(() => {
+      fetchProducts(); // Call fetchProducts on location change
+    });
+    return () => {
+      unlisten();
+    };
+  }, [history]); // Dependency array includes history
 
   const handleDelete = async (productId) => {
     await ProductService.deleteProduct(productId);
-    setProducts(products.filter((product) => product.id !== productId));
-    setSelectedProductId(false);
+    fetchProducts(); // Refresh products after deletion
+    setSelectedProductId(undefined);
   };
+
   const handleGoToClientProduct = () => {
     history.push("/");
   };
+
   const handleAddNewProduct = () => {
     history.push("/admin/product/create");
   };
 
-  const handleEditProduct = (product) => {
-    history.push(`/admin/product/edit/`);
+  const handleEditProduct = async (productId) => {
+    history.push(`/edit-product/${productId}`);
   };
 
   return (
     <div>
       <Button
-        style={{ marginLeft: "80%" }}
+        style={{ marginLeft: "76%", marginTop: "2%" }}
         onClick={handleGoToClientProduct}
         variant="contained"
       >
-        go to client
+        Go to Client
       </Button>
       <div className="formAdminProduct">
         <Typography variant="h4" gutterBottom>
@@ -90,7 +96,7 @@ const AdminProductList = ({ handleSearch }) => {
 
                 <Button
                   className="btnEdit"
-                  onClick={handleEditProduct}
+                  onClick={() => handleEditProduct(product.id)}
                   variant="contained"
                   startIcon={<EditCalendarIcon />}
                 >
@@ -112,21 +118,23 @@ const AdminProductList = ({ handleSearch }) => {
             </div>
           ))}
           <Dialog
-            open={selectedProductId}
+            open={Boolean(selectedProductId)}
             onClose={handleClose}
             aria-labelledby="alert-dialog-title"
             aria-describedby="alert-dialog-description"
           >
-            <DialogTitle id="alert-dialog-title">{"xoa san pham?"}</DialogTitle>
+            <DialogTitle id="alert-dialog-title">
+              {"Delete Product?"}
+            </DialogTitle>
             <DialogContent>
               <DialogContentText id="alert-dialog-description">
-                ban co chac chan thay doi nay?
+                Are you sure you want to delete this product?
               </DialogContentText>
             </DialogContent>
             <DialogActions>
-              <Button onClick={handleClose}>khong </Button>
+              <Button onClick={handleClose}>Cancel</Button>
               <Button onClick={() => handleDelete(selectedProductId)}>
-                dong y
+                Confirm
               </Button>
             </DialogActions>
           </Dialog>

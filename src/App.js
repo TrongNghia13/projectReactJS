@@ -12,13 +12,14 @@ import Cart from "./component/Cart";
 import ProductDetails from "./component/ProductDetails";
 import AdminProductList from "./component/AdminProductList";
 import ProductList from "./component/ProductList";
-import SearchIcon from "@mui/icons-material/Search";
-import { Button } from "@mui/material";
-import HomePage from "./page/HomePage";
-import ProductService from "./services/productService";
 import EditProduct from "./component/EditProduct";
+import TabBar from "./component/TabBar ";
+import { Tabs, Tab, Box } from "@mui/material";
+import "../src/styles/cart.css";
+import "./styles/tabBar.css";
+import SearchBar from "./component/SearchBar";
 
-function App() {
+function App({}) {
   // const [products, setProducts] = useState([]);
 
   const [cartItems, setCartItems] = useState([]);
@@ -78,13 +79,25 @@ function App() {
   return (
     <Router>
       <nav
+        className="tarBar"
         style={{
           display: "flex",
           justifyContent: "space-between",
           padding: "1rem",
+          borderBottom: "1px solid",
         }}
       >
-        <Link to="/">Home</Link>
+        <Tab
+          style={{ color: "white" }}
+          label="Home"
+          value="/"
+          to="/"
+          component={Link}
+        />
+        <div style={{ paddingTop: "1%" }}>
+          <SearchBar />
+        </div>
+
         {/* <div>
           <input
             type="text"
@@ -116,56 +129,41 @@ function App() {
             <SearchIcon />
           </Button>
         </div> */}
-
-        <Link to="/cart">
-          <div>
-            <AddShoppingCartIcon />
-          </div>
-          <div>
-            {cartItems.length === 0 ? null : (
-              <div
-                className="addIconsCart"
-                style={{
-                  color: "black",
-                  position: "absolute",
-                  background: "lightsteelblue",
-                  padding: "5px",
-                  right: "6px",
-                  top: "2px",
-                  fontSize: "10px",
-                  borderRadius: "50%",
-                  minHeight: "10px",
-                  minWidth: "10px",
-                  textAlign: "center",
-                }}
-              >
-                {getTotalQuantity()}
-              </div>
-            )}
-            {getTotalQuantity() > 0 &&
-            getTotalQuantity() >= badgeVisibilityThreshold ? (
-              <div
-                className="addIconsCart"
-                style={{
-                  color: "black",
-                  position: "absolute",
-                  background: "lightsteelblue",
-                  padding: "5px",
-                  right: "6px",
-                  top: "2px",
-                  fontSize: "10px",
-                  borderRadius: "50%",
-                  minHeight: "10px",
-                  minWidth: "10px",
-                  textAlign: "center",
-                }}
-              >
-                10
-                <text>+</text>
-              </div>
-            ) : null}
-          </div>
-        </Link>
+        <div className="cart" style={{ paddingTop: "2%" }}>
+          <Link to="/cart">
+            <div style={{ color: "whitesmoke" }}>
+              <AddShoppingCartIcon />
+            </div>
+            <div>
+              {cartItems.length === 0 ? null : (
+                <div
+                  className="iconsCart"
+                  style={{
+                    position: "absolute",
+                    background: "lightsteelblue",
+                    padding: "5px",
+                    right: "6px",
+                    top: "2px",
+                    fontSize: "10px",
+                    borderRadius: "50%",
+                    minHeight: "10px",
+                    minWidth: "10px",
+                    textAlign: "center",
+                  }}
+                >
+                  {getTotalQuantity()}
+                </div>
+              )}
+              {getTotalQuantity() > 0 &&
+              getTotalQuantity() >= badgeVisibilityThreshold ? (
+                <div className="addIconsCart">
+                  10
+                  <text>+</text>
+                </div>
+              ) : null}
+            </div>
+          </Link>
+        </div>
       </nav>
 
       <Switch>
@@ -183,9 +181,8 @@ function App() {
           />
         </Route>
 
-        <Route path="/admin/product/edit/">
-          <EditProduct />
-        </Route>
+        <Route path="/edit-product/:productId" component={EditProduct} />
+
         <Route path="/admin/product/create">
           <AddProductItem />
         </Route>

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import ListComponent from "./ListComponent";
+import SearchBar from "./SearchBar";
 // import data from "../MOCK_DATA.json";
 import SearchIcon from "@mui/icons-material/Search";
 import {
@@ -415,7 +416,7 @@ function ProductList({ onAddToCart }) {
             position: "relative",
           }}
         >
-          <div>
+          {/* <div>
             <input
               type="text"
               placeholder="Search products..."
@@ -445,7 +446,7 @@ function ProductList({ onAddToCart }) {
             >
               <SearchIcon />
             </Button>
-          </div>
+          </div> */}
           {showSuggestions && (
             <ul
               className="suggestions-style"
