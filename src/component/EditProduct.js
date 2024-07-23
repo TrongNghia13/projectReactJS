@@ -12,7 +12,8 @@ import {
 } from "@mui/material";
 
 const EditProduct = () => {
-  const { productId } = useParams(); // Lấy productId từ URL
+  const { productId } = useParams();
+  const numericProductId = Number(productId);
   const [title, setTitle] = useState("");
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
@@ -43,33 +44,47 @@ const EditProduct = () => {
   };
 
   useEffect(() => {
-    console.log("Product ID:", productId); // Kiểm tra giá trị productId
-    if (!productId) {
+    console.log("Product ID:", numericProductId); // Kiểm tra giá trị productId
+    if (!numericProductId) {
       console.error("Product ID is missing.");
       return;
     }
 
     const fetchProduct = async () => {
       setIsLoading(true);
-      const fetchedProduct = await ProductService.getById(productId);
-      if (fetchedProduct) {
-        setTitle(fetchedProduct.title || "");
-        setPrice(fetchedProduct.price || "");
-        setDescription(fetchedProduct.description || "");
-        setImage(fetchedProduct.image || "");
-        setRating(fetchedProduct.rating?.rate || "");
-        setCount(fetchedProduct.rating?.count || "");
+      try {
+        const fetchedProduct = await ProductService.getById(numericProductId);
+        console.log("Fetched Product:", fetchedProduct); // Kiểm tra sản phẩm đã được lấy
+        if (fetchedProduct) {
+          setTitle(fetchedProduct.title || "");
+          setPrice(fetchedProduct.price || "");
+          setDescription(fetchedProduct.description || "");
+          setImage(fetchedProduct.image || "");
+          setRating(fetchedProduct.rating?.rate || "");
+          setCount(fetchedProduct.rating?.count || "");
+        } else {
+          console.error("Product not found.");
+          setSnackbarMessage("Product not found.");
+          setSnackbarSeverity("error");
+          setOpenSnackbar(true);
+        }
+      } catch (error) {
+        console.error("Failed to fetch product:", error);
+        setSnackbarMessage("Failed to fetch product.");
+        setSnackbarSeverity("error");
+        setOpenSnackbar(true);
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     };
 
     fetchProduct();
-  }, [productId]);
+  }, [numericProductId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!productId) {
+    if (!numericProductId) {
       setSnackbarMessage("Product ID is missing.");
       setSnackbarSeverity("error");
       setOpenSnackbar(true);
@@ -77,7 +92,7 @@ const EditProduct = () => {
     }
 
     const updatedProduct = {
-      id: productId,
+      id: numericProductId, // Chuyển đổi productId thành số
       title,
       price,
       description,
@@ -97,6 +112,10 @@ const EditProduct = () => {
         setTimeout(() => {
           history.push("/admin/product");
         }, 1500);
+      } else {
+        setSnackbarMessage("Product update failed.");
+        setSnackbarSeverity("error");
+        setOpenSnackbar(true);
       }
     } catch (error) {
       setSnackbarMessage("Failed to edit product.");

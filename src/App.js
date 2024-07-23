@@ -88,7 +88,7 @@ function App({}) {
         }}
       >
         <Tab
-          style={{ color: "white" }}
+          style={{ color: "white", fontSize: "20px" }}
           label="Home"
           value="/"
           to="/"
@@ -129,7 +129,7 @@ function App({}) {
             <SearchIcon />
           </Button>
         </div> */}
-        <div className="cart" style={{ paddingTop: "2%" }}>
+        <div className="cart" style={{ paddingTop: "2%", fontSize: "20px" }}>
           <Link to="/cart">
             <div style={{ color: "whitesmoke" }}>
               <AddShoppingCartIcon />
@@ -143,7 +143,7 @@ function App({}) {
                     background: "lightsteelblue",
                     padding: "5px",
                     right: "6px",
-                    top: "2px",
+                    top: "25px",
                     fontSize: "10px",
                     borderRadius: "50%",
                     minHeight: "10px",

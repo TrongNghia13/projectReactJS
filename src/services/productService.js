@@ -57,9 +57,16 @@ const ProductService = {
       }, 500);
     });
   },
+
   getById: async (id) => {
     const products = getStorageData(PRODUCT_LOCAL_STORAGE_KEY, []);
-    const product = products.find((product) => product.id === id);
+    console.log("Products in storage:", products); // Kiểm tra tất cả sản phẩm trong localStorage
+
+    // Đảm bảo id là số để so sánh chính xác
+    const numericId = Number(id);
+    const product = products.find((product) => product.id === numericId);
+
+    console.log("Found Product:", product); // Kiểm tra sản phẩm tìm thấy
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve(product);

@@ -1,8 +1,9 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import SearchIcon from "@mui/icons-material/Search";
 import { Button } from "@mui/material";
 import { useHistory } from "react-router-dom";
 import "../styles/searchBar.css";
+import ProductService from "../services/productService"; // Điều chỉnh import theo đường dẫn thực tế
 
 const SearchBar = ({ onSearch }) => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -12,6 +13,19 @@ const SearchBar = ({ onSearch }) => {
   const [initialProducts, setInitialProducts] = useState([]);
   const inputRef = useRef(null);
   const history = useHistory();
+
+  useEffect(() => {
+    const fetchInitialProducts = async () => {
+      try {
+        const products = await ProductService.getPaged({ limit: 0, offset: 0 });
+        setInitialProducts(products);
+      } catch (error) {
+        console.error("Failed to fetch products:", error);
+      }
+    };
+
+    fetchInitialProducts();
+  }, []);
 
   const handleFilterData = (searchTerm) => (product) =>
     product.title.toLowerCase().includes(searchTerm.toLowerCase());

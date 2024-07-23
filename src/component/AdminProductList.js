@@ -69,13 +69,29 @@ const AdminProductList = () => {
 
   return (
     <div>
-      <Button
-        style={{ marginLeft: "76%", marginTop: "2%" }}
-        onClick={handleGoToClientProduct}
-        variant="contained"
-      >
-        Go to Client
-      </Button>
+      <div className="btnClient">
+        <Button
+          style={{
+            marginLeft: "76%",
+            marginTop: "2%",
+            background: "gray",
+          }}
+          onClick={handleGoToClientProduct}
+          variant="contained"
+        >
+          Go to Client
+        </Button>
+        <Button
+          style={{ marginLeft: "2%", marginTop: "2%", borderLeft: "1px" }}
+          onClick={handleAddNewProduct}
+          variant="contained"
+          color="success"
+          startIcon={<AddIcon />}
+        >
+          Add
+        </Button>
+      </div>
+
       <div className="formAdminProduct">
         <Typography variant="h4" gutterBottom>
           Admin Product List
@@ -84,16 +100,6 @@ const AdminProductList = () => {
           {products.map((product) => (
             <div key={product.id}>
               <div className="btnProduct">
-                <Button
-                  className="btnAdd"
-                  onClick={handleAddNewProduct}
-                  variant="contained"
-                  color="success"
-                  startIcon={<AddIcon />}
-                >
-                  Add
-                </Button>
-
                 <Button
                   className="btnEdit"
                   onClick={() => handleEditProduct(product.id)}
