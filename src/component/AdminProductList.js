@@ -69,7 +69,7 @@ const AdminProductList = () => {
 
   return (
     <div>
-      <div className="btnClient">
+      <Box className="btnClient">
         <Button
           style={{
             marginLeft: "76%",
@@ -90,7 +90,7 @@ const AdminProductList = () => {
         >
           Add
         </Button>
-      </div>
+      </Box>
 
       <div className="formAdminProduct">
         <Typography variant="h4" gutterBottom>
@@ -140,7 +140,7 @@ const AdminProductList = () => {
             <DialogActions>
               <Button onClick={handleClose}>Cancel</Button>
               <Button onClick={() => handleDelete(selectedProductId)}>
-                Confirm
+                yes
               </Button>
             </DialogActions>
           </Dialog>

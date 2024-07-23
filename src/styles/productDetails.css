@@ -27,11 +27,12 @@
     max-width: 30%; 
     height: auto; 
     padding-left: 218px;
+    ;
   }
   .product-image-home-details{
     max-width: 50%;
     max-height: 30%;
-    margin-left: 25%;
+   padding-left: 35%; 
   }
   .product-details{
     color: rgb(244, 75, 75);

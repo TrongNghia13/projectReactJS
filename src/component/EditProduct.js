@@ -9,6 +9,11 @@ import {
   Alert,
   Box,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from "@mui/material";
 
 const EditProduct = () => {
@@ -23,6 +28,7 @@ const EditProduct = () => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
+  const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const history = useHistory();
 
@@ -34,6 +40,12 @@ const EditProduct = () => {
     rating: false,
     count: false,
   });
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   const handleBlur = (field) => (e) => {
     setErrors({ ...errors, [field]: e.target.value === "" });
@@ -123,101 +135,136 @@ const EditProduct = () => {
       setOpenSnackbar(true);
     }
   };
+  const handleBackAdminProduct = () => {
+    history.push("/admin/product");
+  };
 
   return (
-    <Box sx={{ maxWidth: 500, mx: "auto", mt: 4 }}>
-      <Typography variant="h4" gutterBottom>
-        Edit Product
-      </Typography>
-      {isLoading ? (
-        <CircularProgress />
-      ) : (
-        <form onSubmit={handleSubmit}>
-          <TextField
-            label="Title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            onBlur={handleBlur("title")}
-            error={errors.title}
-            helperText={errors.title && "Title is required"}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            label="Price"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-            onBlur={handleBlur("price")}
-            error={errors.price}
-            helperText={errors.price && "Price is required"}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            label="Description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            onBlur={handleBlur("description")}
-            error={errors.description}
-            helperText={errors.description && "Description is required"}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            label="Image URL"
-            value={image}
-            onChange={(e) => setImage(e.target.value)}
-            onBlur={handleBlur("image")}
-            error={errors.image}
-            helperText={errors.image && "Image URL is required"}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            label="Rating"
-            value={rating}
-            onChange={(e) => setRating(e.target.value)}
-            onBlur={handleBlur("rating")}
-            error={errors.rating}
-            helperText={errors.rating && "Rating is required"}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            label="Count"
-            value={count}
-            onChange={(e) => setCount(e.target.value)}
-            onBlur={handleBlur("count")}
-            error={errors.count}
-            helperText={errors.count && "Count is required"}
-            fullWidth
-            margin="normal"
-          />
-          <Button
-            variant="contained"
-            color="primary"
-            type="submit"
-            fullWidth
-            sx={{ mt: 2 }}
-          >
-            Edit Product
-          </Button>
-        </form>
-      )}
-      <Snackbar
-        open={openSnackbar}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
+    <>
+      <Button
+        style={{
+          marginLeft: "76%",
+          marginTop: "2%",
+          background: "gray",
+          maxWidth: "20px",
+          backgroundColor: "cornflowerblue",
+        }}
+        variant="contained"
+        onClick={handleClickOpen}
       >
-        <Alert
+        Back
+      </Button>
+      <Dialog
+        open={Boolean(open)}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"Delete Product?"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            You haven't saved your edits, are you sure you want to go back?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Cancel</Button>
+          <Button onClick={() => handleBackAdminProduct(open)}>yes</Button>
+        </DialogActions>
+      </Dialog>
+      <Box sx={{ maxWidth: 400, maxHeight: 350, mx: "auto", mb: 9 }}>
+        <Typography variant="h4" gutterBottom>
+          Edit Product
+        </Typography>
+        {isLoading ? (
+          <CircularProgress />
+        ) : (
+          <form onSubmit={handleSubmit}>
+            <TextField
+              label="Title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              onBlur={handleBlur("title")}
+              error={errors.title}
+              helperText={errors.title && "Title is required"}
+              fullWidth
+              margin="normal"
+            />
+            <TextField
+              label="Price"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              onBlur={handleBlur("price")}
+              error={errors.price}
+              helperText={errors.price && "Price is required"}
+              fullWidth
+              margin="normal"
+            />
+            <TextField
+              label="Description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              onBlur={handleBlur("description")}
+              error={errors.description}
+              helperText={errors.description && "Description is required"}
+              fullWidth
+              margin="normal"
+            />
+            <TextField
+              label="Image URL"
+              value={image}
+              onChange={(e) => setImage(e.target.value)}
+              onBlur={handleBlur("image")}
+              error={errors.image}
+              helperText={errors.image && "Image URL is required"}
+              fullWidth
+              margin="normal"
+            />
+            <TextField
+              label="Rating"
+              value={rating}
+              onChange={(e) => setRating(e.target.value)}
+              onBlur={handleBlur("rating")}
+              error={errors.rating}
+              helperText={errors.rating && "Rating is required"}
+              fullWidth
+              margin="normal"
+            />
+            <TextField
+              label="Count"
+              value={count}
+              onChange={(e) => setCount(e.target.value)}
+              onBlur={handleBlur("count")}
+              error={errors.count}
+              helperText={errors.count && "Count is required"}
+              fullWidth
+              margin="normal"
+            />
+            <Button
+              variant="contained"
+              color="primary"
+              type="submit"
+              fullWidth
+              sx={{ mt: 2 }}
+            >
+              Edit Product
+            </Button>
+          </form>
+        )}
+        <Snackbar
+          open={openSnackbar}
+          autoHideDuration={6000}
           onClose={handleCloseSnackbar}
-          severity={snackbarSeverity}
-          sx={{ width: "100%" }}
         >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
-    </Box>
+          <Alert
+            onClose={handleCloseSnackbar}
+            severity={snackbarSeverity}
+            sx={{ width: "100%" }}
+          >
+            {snackbarMessage}
+          </Alert>
+        </Snackbar>
+      </Box>
+    </>
   );
 };
 

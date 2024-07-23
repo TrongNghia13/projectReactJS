@@ -94,7 +94,7 @@ function App({}) {
           to="/"
           component={Link}
         />
-        <div style={{ paddingTop: "1%" }}>
+        <div style={{ paddingTop: "1%", paddingRight: "2%" }}>
           <SearchBar />
         </div>
 

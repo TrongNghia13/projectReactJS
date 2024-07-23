@@ -368,7 +368,12 @@ function ProductList({ onAddToCart }) {
                   src={item.image}
                 />
               ) : (
-                <Skeleton variant="rectangular" width={225} height={330} />
+                <Skeleton
+                  style={{ background: "bray" }}
+                  variant="rectangular"
+                  width={225}
+                  height={330}
+                />
               )}
               {item ? (
                 <Box sx={{ pr: 2 }}>
@@ -518,7 +523,7 @@ function ProductList({ onAddToCart }) {
           <FormControl
             variant="outlined"
             size="small"
-            style={{ minWidth: 150 }}
+            style={{ minWidth: 150, marginTop: "5%" }}
           >
             <InputLabel> Sort By</InputLabel>
             <Select
@@ -529,28 +534,24 @@ function ProductList({ onAddToCart }) {
               // onClick={() => navigateToClick()}
             >
               <MenuItem value="latest">Latest</MenuItem>
-              <MenuItem value="popular"> Product</MenuItem>
+              <MenuItem value="popular"> Popular</MenuItem>
               <MenuItem value="priceAsc">Low to High</MenuItem>
               <MenuItem value="priceDesc"> High to Low</MenuItem>
             </Select>
           </FormControl>
 
-          {/* <Button
-          variant="contained"
-          color="primary"
-          onClick={handleSearch}
-          style={{ marginLeft: "8px" }}
-        >
-          Apply Filters
-        </Button> */}
+          <Button
+            style={{
+              minWidth: 150,
+              marginLeft: "80%",
+              marginBottom: "5%",
+            }}
+            onClick={handleAdminProductClick}
+            variant="contained"
+          >
+            Admin Product
+          </Button>
         </div>
-        <Button
-          style={{ marginLeft: "80%" }}
-          onClick={handleAdminProductClick}
-          variant="contained"
-        >
-          Admin Product
-        </Button>
 
         {/* <Button
           style={{ marginLeft: "80%" }}
