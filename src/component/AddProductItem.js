@@ -15,6 +15,7 @@ import {
   DialogTitle,
 } from "@mui/material";
 import ProductService from "../services/productService";
+import CategoryService from "../services/CategoryService";
 
 function AddProductItem() {
   const [title, setTitle] = useState("");
@@ -91,6 +92,9 @@ function AddProductItem() {
       if (response) {
         setSnackbarMessage("Product added successfully!");
         setSnackbarSeverity("success");
+        setTimeout(() => {
+          history.push("/admin/product");
+        }, 1500);
       }
     } catch (error) {
       setSnackbarMessage("Failed to add product.");

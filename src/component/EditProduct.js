@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useHistory } from "react-router-dom";
 import ProductService from "../services/productService";
+import CategoryService from "../services/CategoryService";
 import {
   Typography,
   TextField,
@@ -15,16 +16,22 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@mui/material";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
 
 const EditProduct = () => {
   const { productId } = useParams();
   const numericProductId = Number(productId);
+  const [categories, setCategories] = useState([]);
   const [title, setTitle] = useState("");
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
   const [image, setImage] = useState("");
   const [rating, setRating] = useState("");
   const [count, setCount] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("undefined");
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
@@ -39,10 +46,13 @@ const EditProduct = () => {
     image: false,
     rating: false,
     count: false,
+    category: false,
   });
+
   const handleClickOpen = () => {
     setOpen(true);
   };
+
   const handleClose = () => {
     setOpen(false);
   };
@@ -55,8 +65,17 @@ const EditProduct = () => {
     setOpenSnackbar(false);
   };
 
+  // Fetch categories
   useEffect(() => {
-    console.log("Product ID:", numericProductId); // Kiểm tra giá trị productId
+    const fetchCategories = async () => {
+      const response = await CategoryService.getAll();
+      setCategories(response);
+    };
+    fetchCategories();
+  }, []);
+
+  // Fetch product and update category when categories are ready
+  useEffect(() => {
     if (!numericProductId) {
       console.error("Product ID is missing.");
       return;
@@ -66,7 +85,6 @@ const EditProduct = () => {
       setIsLoading(true);
       try {
         const fetchedProduct = await ProductService.getById(numericProductId);
-        console.log("Fetched Product:", fetchedProduct); // Kiểm tra sản phẩm đã được lấy
         if (fetchedProduct) {
           setTitle(fetchedProduct.title || "");
           setPrice(fetchedProduct.price || "");
@@ -74,14 +92,21 @@ const EditProduct = () => {
           setImage(fetchedProduct.image || "");
           setRating(fetchedProduct.rating?.rate || "");
           setCount(fetchedProduct.rating?.count || "");
+
+          if (categories.length > 0) {
+            const category = categories.find(
+              (cat) => cat.id === fetchedProduct.categoryId
+            );
+            if (category) {
+              setSelectedCategory(category.id);
+            }
+          }
         } else {
-          console.error("Product not found.");
           setSnackbarMessage("Product not found.");
           setSnackbarSeverity("error");
           setOpenSnackbar(true);
         }
       } catch (error) {
-        console.error("Failed to fetch product:", error);
         setSnackbarMessage("Failed to fetch product.");
         setSnackbarSeverity("error");
         setOpenSnackbar(true);
@@ -90,8 +115,10 @@ const EditProduct = () => {
       }
     };
 
-    fetchProduct();
-  }, [numericProductId]);
+    if (categories.length > 0) {
+      fetchProduct();
+    }
+  }, [numericProductId, categories]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -104,7 +131,7 @@ const EditProduct = () => {
     }
 
     const updatedProduct = {
-      id: numericProductId, // Chuyển đổi productId thành số
+      id: numericProductId,
       title,
       price,
       description,
@@ -113,6 +140,7 @@ const EditProduct = () => {
         rate: rating,
         count: count,
       },
+      categoryId: selectedCategory, // Use selectedCategory for the API
     };
 
     try {
@@ -135,8 +163,13 @@ const EditProduct = () => {
       setOpenSnackbar(true);
     }
   };
+
   const handleBackAdminProduct = () => {
     history.push("/admin/product");
+  };
+
+  const handleChangeCategory = (event: SelectChangeEvent) => {
+    setSelectedCategory(event.target.value);
   };
 
   return (
@@ -168,10 +201,10 @@ const EditProduct = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={() => handleBackAdminProduct(open)}>yes</Button>
+          <Button onClick={handleBackAdminProduct}>Yes</Button>
         </DialogActions>
       </Dialog>
-      <Box sx={{ maxWidth: 400, maxHeight: 350, mx: "auto", mb: 9 }}>
+      <Box sx={{ maxWidth: 400, mx: "auto", mb: 9 }}>
         <Typography variant="h4" gutterBottom>
           Edit Product
         </Typography>
@@ -179,6 +212,22 @@ const EditProduct = () => {
           <CircularProgress />
         ) : (
           <form onSubmit={handleSubmit}>
+            <FormControl fullWidth>
+              <InputLabel id="category-select-label">Category</InputLabel>
+              <Select
+                labelId="category-select-label"
+                id="category-select"
+                value={selectedCategory}
+                label="Category"
+                onChange={handleChangeCategory}
+              >
+                {categories.map((cat) => (
+                  <MenuItem key={cat.id} value={cat.id}>
+                    {cat.category}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
             <TextField
               label="Title"
               value={title}
@@ -239,6 +288,7 @@ const EditProduct = () => {
               fullWidth
               margin="normal"
             />
+
             <Button
               variant="contained"
               color="primary"

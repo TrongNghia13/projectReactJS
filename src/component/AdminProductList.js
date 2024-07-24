@@ -16,6 +16,7 @@ import {
 } from "@mui/material";
 
 import "../styles/adminProductList.css";
+import { Category } from "@mui/icons-material";
 
 const AdminProductList = () => {
   const [products, setProducts] = useState([]);
@@ -97,12 +98,12 @@ const AdminProductList = () => {
           Admin Product List
         </Typography>
         <Box sx={{ width: "100%" }}>
-          {products.map((product) => (
+          {products.map((product, category) => (
             <div key={product.id}>
               <div className="btnProduct">
                 <Button
                   className="btnEdit"
-                  onClick={() => handleEditProduct(product.id)}
+                  onClick={() => handleEditProduct(product.id, category.id)}
                   variant="contained"
                   startIcon={<EditCalendarIcon />}
                 >
