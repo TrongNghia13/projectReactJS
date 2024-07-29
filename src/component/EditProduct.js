@@ -31,7 +31,7 @@ const EditProduct = () => {
   const [image, setImage] = useState("");
   const [rating, setRating] = useState("");
   const [count, setCount] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("undefined");
+  const [selectedCategory, setSelectedCategory] = useState(""); // Khởi tạo chuỗi rỗng
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
@@ -68,23 +68,33 @@ const EditProduct = () => {
   // Fetch categories
   useEffect(() => {
     const fetchCategories = async () => {
-      const response = await CategoryService.getAll();
-      setCategories(response);
+      try {
+        console.log("Fetching categories...");
+        const response = await CategoryService.getAll();
+        setCategories(response);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+        setSnackbarMessage(`Failed to fetch categories: ${error.message}`);
+        setSnackbarSeverity("error");
+        setOpenSnackbar(true);
+      }
     };
     fetchCategories();
   }, []);
 
   // Fetch product and update category when categories are ready
   useEffect(() => {
-    if (!numericProductId) {
-      console.error("Product ID is missing.");
+    if (!numericProductId || categories.length === 0) {
       return;
     }
-
+  
     const fetchProduct = async () => {
       setIsLoading(true);
       try {
         const fetchedProduct = await ProductService.getById(numericProductId);
+        console.log("Fetched Product:", fetchedProduct); // Debugging
+        console.log("Available Categories:", categories); // Debugging
+  
         if (fetchedProduct) {
           setTitle(fetchedProduct.title || "");
           setPrice(fetchedProduct.price || "");
@@ -92,14 +102,16 @@ const EditProduct = () => {
           setImage(fetchedProduct.image || "");
           setRating(fetchedProduct.rating?.rate || "");
           setCount(fetchedProduct.rating?.count || "");
-
-          if (categories.length > 0) {
-            const category = categories.find(
-              (cat) => cat.id === fetchedProduct.categoryId
-            );
-            if (category) {
-              setSelectedCategory(category.id);
-            }
+  
+          // Check if category exists in fetched categories
+          const category = categories.find((cat) => cat.id === fetchedProduct.category);
+          if (category) {
+            setSelectedCategory(category.id);
+          } else {
+            console.error("Category ID not found in fetched categories:", fetchedProduct.category);
+            setSnackbarMessage("Category not found.");
+            setSnackbarSeverity("error");
+            setOpenSnackbar(true);
           }
         } else {
           setSnackbarMessage("Product not found.");
@@ -114,14 +126,32 @@ const EditProduct = () => {
         setIsLoading(false);
       }
     };
-
-    if (categories.length > 0) {
-      fetchProduct();
-    }
+  
+    fetchProduct();
   }, [numericProductId, categories]);
+  
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const newErrors = {
+      title: title.trim() === "",
+      price: price.trim() === "",
+      description: description.trim() === "",
+      image: image.trim() === "",
+      rating: rating.trim() === "",
+      count: count.trim() === "",
+      category: selectedCategory === "",
+    };
+
+    if (Object.values(newErrors).some((error) => error)) {
+      setErrors(newErrors);
+      setSnackbarMessage("Please fill out all fields.");
+      setSnackbarSeverity("error");
+      setOpenSnackbar(true);
+      return;
+    }
 
     if (!numericProductId) {
       setSnackbarMessage("Product ID is missing.");
@@ -168,8 +198,9 @@ const EditProduct = () => {
     history.push("/admin/product");
   };
 
-  const handleChangeCategory = (event: SelectChangeEvent) => {
+  const handleChangeCategory = (event: SelectChangeEvent<string>) => {
     setSelectedCategory(event.target.value);
+    setErrors({ ...errors, category: false }); // Clear category error on change
   };
 
   return (
@@ -212,7 +243,7 @@ const EditProduct = () => {
           <CircularProgress />
         ) : (
           <form onSubmit={handleSubmit}>
-            <FormControl fullWidth>
+            <FormControl fullWidth margin="normal">
               <InputLabel id="category-select-label">Category</InputLabel>
               <Select
                 labelId="category-select-label"
@@ -288,32 +319,27 @@ const EditProduct = () => {
               fullWidth
               margin="normal"
             />
-
-            <Button
-              variant="contained"
-              color="primary"
-              type="submit"
-              fullWidth
-              sx={{ mt: 2 }}
-            >
-              Edit Product
+            <Button type="submit" variant="contained" color="primary">
+              Save Changes
             </Button>
           </form>
         )}
-        <Snackbar
-          open={openSnackbar}
-          autoHideDuration={6000}
-          onClose={handleCloseSnackbar}
-        >
-          <Alert
-            onClose={handleCloseSnackbar}
-            severity={snackbarSeverity}
-            sx={{ width: "100%" }}
-          >
-            {snackbarMessage}
-          </Alert>
-        </Snackbar>
       </Box>
+
+      {/* Snackbar for Error and Success Messages */}
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbarSeverity}
+          sx={{ width: "100%" }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </>
   );
 };

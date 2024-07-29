@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useHistory, useLocation } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useHistory } from "react-router-dom";
 import {
   Typography,
   TextField,
@@ -7,12 +7,16 @@ import {
   Snackbar,
   Alert,
   Box,
-  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
+  MenuItem,
+  Select,
+  InputLabel,
+  FormControl,
+  FormHelperText,
 } from "@mui/material";
 import ProductService from "../services/productService";
 import CategoryService from "../services/CategoryService";
@@ -24,6 +28,8 @@ function AddProductItem() {
   const [image, setImage] = useState("");
   const [rating, setRating] = useState("");
   const [count, setCount] = useState("");
+  const [category, setCategory] = useState(""); // State for selected category
+  const [categories, setCategories] = useState([]); // State for categories
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
@@ -37,12 +43,34 @@ function AddProductItem() {
     image: false,
     rating: false,
     count: false,
+    category: false, // Error state for category
   });
+
+  useEffect(() => {
+    // Fetch categories when component mounts
+    const fetchCategories = async () => {
+      try {
+        const categoriesList = await CategoryService.getAll();
+        setCategories(categoriesList);
+      } catch (error) {
+        console.error("Failed to fetch categories:", error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
   const handleClickOpen = () => {
     setOpen(true);
   };
+
   const handleClose = () => {
     setOpen(false);
+  };
+
+  const handleChangeCategory = (e) => {
+    setCategory(e.target.value);
+    setErrors({ ...errors, category: false }); // Clear category error on change
   };
 
   const handleBlur = (field) => (e) => {
@@ -59,6 +87,7 @@ function AddProductItem() {
       image: image === "",
       rating: rating === "",
       count: count === "",
+      category: category === "", // Check if category is selected
     };
 
     if (Object.values(newErrors).some((error) => error)) {
@@ -77,16 +106,10 @@ function AddProductItem() {
         rate: rating,
         count: count,
       },
+      category, // Include category in new product
     };
 
     try {
-      // const response = await fetch("https://fakestoreapi.com/products", {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify(newProduct),
-      // });
       const response = await ProductService.create(newProduct);
 
       if (response) {
@@ -102,9 +125,11 @@ function AddProductItem() {
     }
     setOpenSnackbar(true);
   };
+
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
   };
+
   const handleBackAdminProduct = () => {
     history.push("/admin/product");
   };
@@ -115,8 +140,6 @@ function AddProductItem() {
         style={{
           marginLeft: "76%",
           marginTop: "2%",
-          background: "gray",
-          maxWidth: "20px",
           backgroundColor: "cornflowerblue",
         }}
         variant="contained"
@@ -138,10 +161,10 @@ function AddProductItem() {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={() => handleBackAdminProduct(open)}>yes</Button>
+          <Button onClick={handleBackAdminProduct}>Yes</Button>
         </DialogActions>
       </Dialog>
-      <Box sx={{ maxWidth: 400, maxHeight: 350, mx: "auto", mb: 9 }}>
+      <Box sx={{ maxWidth: 400, maxHeight: 550, mx: "auto", mb: 9 }}>
         <Typography variant="h4" gutterBottom>
           Add New Product
         </Typography>
@@ -225,6 +248,24 @@ function AddProductItem() {
               errors.count && count === "" ? "Review Count is required" : ""
             }
           />
+          <FormControl fullWidth margin="normal" error={errors.category && category === ""}>
+            <InputLabel id="category-select-label">Category</InputLabel>
+            <Select
+              labelId="category-select-label"
+              id="category-select"
+              value={category}
+              label="Category"
+              onChange={handleChangeCategory}
+              onBlur={handleBlur("category")}
+            >
+              {categories.map((cat) => (
+                <MenuItem key={cat.id} value={cat.id}>
+                  {cat.category}
+                </MenuItem>
+              ))}
+            </Select>
+            {errors.category && category === "" && <FormHelperText>Category is required</FormHelperText>}
+          </FormControl>
           <Button variant="contained" color="primary" type="submit" fullWidth>
             Add Product
           </Button>
