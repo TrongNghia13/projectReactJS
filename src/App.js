@@ -1,41 +1,29 @@
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
-import React, { useEffect, useState, useRef } from "react";
-import {
-  Link,
-  Route,
-  BrowserRouter as Router,
-  Switch,
-  useHistory,
-} from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, Route, BrowserRouter as Router, Switch } from "react-router-dom";
 import AddProductItem from "./component/AddProductItem";
 import Cart from "./component/Cart";
 import ProductDetails from "./component/ProductDetails";
 import AdminProductList from "./component/AdminProductList";
 import ProductList from "./component/ProductList";
 import EditProduct from "./component/EditProduct";
-import TabBar from "./component/TabBar ";
-import { Tabs, Tab, Box } from "@mui/material";
+import SearchBar from "./component/SearchBar";
+import { Tab } from "@mui/material";
 import "../src/styles/cart.css";
 import "./styles/tabBar.css";
-import SearchBar from "./component/SearchBar";
 
-function App({}) {
-  // const [products, setProducts] = useState([]);
+function App() {
+  const [cartItems, setCartItems] = useState(() => {
+    const storedCartItems = localStorage.getItem("cartItems");
+    return storedCartItems ? JSON.parse(storedCartItems) : [];
+  });
 
-  const [cartItems, setCartItems] = useState([]);
-  const [badgeVisibilityThreshold] = useState(10);
-  const [products, setProducts] = useState();
+  const badgeVisibilityThreshold = 10;
 
   useEffect(() => {
     localStorage.setItem("cartItems", JSON.stringify(cartItems));
     console.log("Saving to localStorage:", cartItems);
   }, [cartItems]);
-
-  // useEffect(() => {
-  //   const filteredProducts = products.filter((product) => product !== null);
-  //   localStorage.setItem("products", JSON.stringify(filteredProducts));
-  //   console.log("Saving to localStorage:", filteredProducts);
-  // }, [products]);
 
   const handleAddToCart = (product, quantity) => {
     const existingItem = cartItems.find((item) => item.id === product.id);
@@ -48,7 +36,7 @@ function App({}) {
       setCartItems(updatedCartItems);
       console.log("Updated cartItems:", updatedCartItems);
     } else {
-      const newCartItems = [...cartItems, { ...product, quantity: quantity }];
+      const newCartItems = [...cartItems, { ...product, quantity }];
       setCartItems(newCartItems);
       console.log("New cartItems:", newCartItems);
     }
@@ -65,7 +53,7 @@ function App({}) {
       handleRemoveFromCart(productId);
     } else {
       const updatedCartItems = cartItems.map((item) =>
-        item.id === productId ? { ...item, quantity: quantity } : item
+        item.id === productId ? { ...item, quantity } : item
       );
       setCartItems(updatedCartItems);
       console.log("Updated cartItems after quantity change:", updatedCartItems);
@@ -97,53 +85,27 @@ function App({}) {
         <div style={{ paddingTop: "1%", paddingRight: "2%" }}>
           <SearchBar />
         </div>
-
-        {/* <div>
-          <input
-            type="text"
-            placeholder="Search products..."
-            value={searchTerm}
-            onChange={handleSearchTermChange}
-            onKeyDown={handleKeyDown}
-            ref={inputRef}
-            style={{
-              padding: "8px",
-              marginRight: "8px",
-              width: "300px",
-              position: "relative",
-              borderRadius: "10px",
-            }}
-            onBlur={() => setShowSuggestions(false)}
-          />
-
-          <Button
-            style={{
-              minWidth: "20px",
-              borderRadius: "5px",
-              padding: "5px",
-              background: "darkgrey",
-              textAlign: "center",
-            }}
-            onClick={handleSearch}
-          >
-            <SearchIcon />
-          </Button>
-        </div> */}
         <div className="cart" style={{ paddingTop: "2%", fontSize: "20px" }}>
           <Link to="/cart">
-            <div style={{ color: "whitesmoke" }}>
-              <AddShoppingCartIcon />
+            <div
+              style={{
+                color: "whitesmoke",
+                paddingRight: "5px",
+                marginBottom: "15px",
+              }}
+            >
+              <AddShoppingCartIcon style={{ marginBottom: "8px" }} />
             </div>
             <div>
-              {cartItems.length === 0 ? null : (
+              {getTotalQuantity() > 0 && (
                 <div
                   className="iconsCart"
                   style={{
                     position: "absolute",
                     background: "lightsteelblue",
                     padding: "5px",
-                    right: "6px",
-                    top: "25px",
+                    right: "8px",
+                    top: "30px",
                     fontSize: "10px",
                     borderRadius: "50%",
                     minHeight: "10px",
@@ -151,16 +113,15 @@ function App({}) {
                     textAlign: "center",
                   }}
                 >
-                  {getTotalQuantity()}
+                  {getTotalQuantity() >= badgeVisibilityThreshold ? (
+                    <>
+                      10<sup>+</sup>
+                    </>
+                  ) : (
+                    getTotalQuantity()
+                  )}
                 </div>
               )}
-              {getTotalQuantity() > 0 &&
-              getTotalQuantity() >= badgeVisibilityThreshold ? (
-                <div className="addIconsCart">
-                  10
-                  <text>+</text>
-                </div>
-              ) : null}
             </div>
           </Link>
         </div>
@@ -180,9 +141,7 @@ function App({}) {
             onQuantityChange={handleQuantityChange}
           />
         </Route>
-
         <Route path="/edit-product/:productId" component={EditProduct} />
-
         <Route path="/admin/product/create">
           <AddProductItem />
         </Route>

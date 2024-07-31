@@ -21,9 +21,10 @@ function Cart({ cartItems, onRemoveFromCart, onQuantityChange }) {
               padding: 16,
             }}
           >
-            <h3>{item.name}</h3>
+            <img className="img_cart" src={item.image} />
+            <h3 className="title_cart">{item.title}</h3>
             <p>Price: {item.price * item.quantity} vnd</p>
-            <div>
+            <div className="quantity_product">
               <button
                 onClick={() =>
                   item.quantity > 1

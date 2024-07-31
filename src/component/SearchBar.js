@@ -25,7 +25,7 @@ const SearchBar = ({ onSearch }) => {
     };
 
     fetchInitialProducts();
-  }, []);
+  }, [setSearchTerm]);
 
   const handleFilterData = (searchTerm) => (product) =>
     product.title.toLowerCase().includes(searchTerm.toLowerCase());

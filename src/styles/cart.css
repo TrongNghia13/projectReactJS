@@ -25,3 +25,18 @@
 .cart{
   padding-top: 1%;
 }
+.img_cart{
+  max-width: 5%;
+  border: 1px solid;
+}
+.title_cart{
+  display: table-column;
+  max-width: 15%;
+
+}
+.btn-delete{
+  margin-left: auto;
+}
+.quantity_product{
+display: contents;
+}

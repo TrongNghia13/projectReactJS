@@ -87,14 +87,14 @@ const EditProduct = () => {
     if (!numericProductId || categories.length === 0) {
       return;
     }
-  
+
     const fetchProduct = async () => {
       setIsLoading(true);
       try {
         const fetchedProduct = await ProductService.getById(numericProductId);
         console.log("Fetched Product:", fetchedProduct); // Debugging
         console.log("Available Categories:", categories); // Debugging
-  
+
         if (fetchedProduct) {
           setTitle(fetchedProduct.title || "");
           setPrice(fetchedProduct.price || "");
@@ -102,13 +102,18 @@ const EditProduct = () => {
           setImage(fetchedProduct.image || "");
           setRating(fetchedProduct.rating?.rate || "");
           setCount(fetchedProduct.rating?.count || "");
-  
+
           // Check if category exists in fetched categories
-          const category = categories.find((cat) => cat.id === fetchedProduct.category);
+          const category = categories.find(
+            (cat) => cat.id === fetchedProduct.category
+          );
           if (category) {
             setSelectedCategory(category.id);
           } else {
-            console.error("Category ID not found in fetched categories:", fetchedProduct.category);
+            console.error(
+              "Category ID not found in fetched categories:",
+              fetchedProduct.category
+            );
             setSnackbarMessage("Category not found.");
             setSnackbarSeverity("error");
             setOpenSnackbar(true);
@@ -126,11 +131,9 @@ const EditProduct = () => {
         setIsLoading(false);
       }
     };
-  
+
     fetchProduct();
   }, [numericProductId, categories]);
-  
-  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -142,7 +145,7 @@ const EditProduct = () => {
       image: image.trim() === "",
       rating: rating.trim() === "",
       count: count.trim() === "",
-      category: selectedCategory === "",
+      category: selectedCategory.trim() === "",
     };
 
     if (Object.values(newErrors).some((error) => error)) {
@@ -200,7 +203,7 @@ const EditProduct = () => {
 
   const handleChangeCategory = (event: SelectChangeEvent<string>) => {
     setSelectedCategory(event.target.value);
-    setErrors({ ...errors, category: false }); // Clear category error on change
+    // setErrors({ ...errors, category: false }); // Clear category error on change
   };
 
   return (

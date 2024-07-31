@@ -19,7 +19,7 @@
     flex-wrap: nowrap; /* Không cho phép xuống dòng */
     overflow-x: auto; /* Cho phép cuộn ngang nếu vượt quá khung chứa */
     gap: 16px;
-    padding: 2px;
+    padding: 15px;
     margin: 0 auto;
     max-width: 100%; /* Giới hạn chiều rộng để tránh kéo dài toàn màn hình */
   }
@@ -75,6 +75,8 @@
     display: flex;
     justify-content: center;
     margin-bottom: 8px;
+    margin-left: 1%;
+    margin-right: 1%;
 
   }
   .product-image-home{

@@ -6,8 +6,12 @@ import EditCalendarIcon from "@mui/icons-material/EditCalendar";
 import AddIcon from "@mui/icons-material/Add";
 import {
   Typography,
+  TextField,
   Button,
+  Snackbar,
+  Alert,
   Box,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -22,6 +26,10 @@ const AdminProductList = () => {
   const [products, setProducts] = useState([]);
   const history = useHistory();
   const location = useLocation();
+  const [selectedCategory, setSelectedCategory] = useState(""); // Khởi tạo chuỗi rỗng
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
   const [selectedProductId, setSelectedProductId] = useState(undefined);
 
   const handleClickOpen = (pid) => {
@@ -48,10 +56,14 @@ const AdminProductList = () => {
     return () => {
       unlisten();
     };
-  }, [history]); // Dependency array includes history
+  }, [history]);
 
   const handleDelete = async (productId) => {
     await ProductService.deleteProduct(productId);
+    setTimeout(() => {
+      history.push("/admin/product");
+    }, 1500);
+
     fetchProducts(); // Refresh products after deletion
     setSelectedProductId(undefined);
   };

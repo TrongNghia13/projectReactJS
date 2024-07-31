@@ -70,7 +70,7 @@ function AddProductItem() {
 
   const handleChangeCategory = (e) => {
     setCategory(e.target.value);
-    setErrors({ ...errors, category: false }); // Clear category error on change
+    setErrors({ ...errors, category: false });
   };
 
   const handleBlur = (field) => (e) => {
@@ -87,7 +87,7 @@ function AddProductItem() {
       image: image === "",
       rating: rating === "",
       count: count === "",
-      category: category === "", // Check if category is selected
+      category: category === "",
     };
 
     if (Object.values(newErrors).some((error) => error)) {
@@ -106,7 +106,7 @@ function AddProductItem() {
         rate: rating,
         count: count,
       },
-      category, // Include category in new product
+      category,
     };
 
     try {
@@ -169,6 +169,30 @@ function AddProductItem() {
           Add New Product
         </Typography>
         <form onSubmit={handleSubmit}>
+          <FormControl
+            fullWidth
+            margin="normal"
+            error={errors.category && category === ""}
+          >
+            <InputLabel id="category-select-label">Category</InputLabel>
+            <Select
+              labelId="category-select-label"
+              id="category-select"
+              value={category}
+              label="Category"
+              onChange={handleChangeCategory}
+              onBlur={handleBlur("category")}
+            >
+              {categories.map((cat) => (
+                <MenuItem key={cat.id} value={cat.id}>
+                  {cat.category}
+                </MenuItem>
+              ))}
+            </Select>
+            {errors.category && category === "" && (
+              <FormHelperText>Category is required</FormHelperText>
+            )}
+          </FormControl>
           <TextField
             label="Title"
             value={title}
@@ -248,26 +272,9 @@ function AddProductItem() {
               errors.count && count === "" ? "Review Count is required" : ""
             }
           />
-          <FormControl fullWidth margin="normal" error={errors.category && category === ""}>
-            <InputLabel id="category-select-label">Category</InputLabel>
-            <Select
-              labelId="category-select-label"
-              id="category-select"
-              value={category}
-              label="Category"
-              onChange={handleChangeCategory}
-              onBlur={handleBlur("category")}
-            >
-              {categories.map((cat) => (
-                <MenuItem key={cat.id} value={cat.id}>
-                  {cat.category}
-                </MenuItem>
-              ))}
-            </Select>
-            {errors.category && category === "" && <FormHelperText>Category is required</FormHelperText>}
-          </FormControl>
+
           <Button variant="contained" color="primary" type="submit" fullWidth>
-            Add Product
+            save
           </Button>
         </form>
         <Snackbar
